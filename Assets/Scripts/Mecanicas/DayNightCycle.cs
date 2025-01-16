@@ -45,7 +45,6 @@ public class DayNightCycle : MonoBehaviour
     {
       float dayProgress = currentDayTime / dayDuration; // Progresso do dia (0 a 1)
       directionalLight.transform.rotation = Quaternion.Euler(new Vector3(dayProgress * 360f - 90f, 170f, 0f));
-      Debug.Log($"Day Hour:{CurrentTime()}");
     }
   }
 
