@@ -25,18 +25,30 @@ def create_material(name, color):
     return mat
 
 # Função para criar uma textura
-def create_texture(image_path):
-    tex = bpy.data.textures.new(name="Texture", type='IMAGE')
+def create_texture(image_path, texture_type):
+    tex = bpy.data.textures.new(name=texture_type, type='IMAGE')
     img = bpy.data.images.load(image_path)
     tex.image = img
     return tex
 
-# Função para aplicar textura a um material
-def apply_texture(material, texture):
-    tex_slot = material.texture_slots.add()
-    tex_slot.texture = texture
-    tex_slot.texture_coords = 'UV'
-    tex_slot.use_map_color_diffuse = True
+# Função para aplicar múltiplas texturas a um material
+def apply_textures(material, textures):
+    for texture_type, texture in textures.items():
+        tex_slot = material.texture_slots.add()
+        tex_slot.texture = texture
+        tex_slot.texture_coords = 'UV'
+        if texture_type == 'albedo':
+            tex_slot.use_map_color_diffuse = True
+        elif texture_type == 'normal':
+            tex_slot.use_map_normal = True
+        elif texture_type == 'metallic':
+            tex_slot.use_map_metallic = True
+        elif texture_type == 'roughness':
+            tex_slot.use_map_roughness = True
+        elif texture_type == 'ao':
+            tex_slot.use_map_ambient = True
+        elif texture_type == 'height':
+            tex_slot.use_map_displacement = True
 
 # Limpa a cena atual
 bpy.ops.object.select_all(action='SELECT')
@@ -68,12 +80,21 @@ baseboard = create_baseboard(baseboard_location, baseboard_width, baseboard_heig
 wall_material = create_material("WallMaterial", (0.8, 0.8, 0.8, 1))
 baseboard_material = create_material("BaseboardMaterial", (0.2, 0.2, 0.2, 1))
 
-# Cria texturas
-wall_texture = create_texture("/path/to/plaster_paint_texture.jpg")
-baseboard_texture = create_texture("/path/to/dark_wood_texture.jpg")
+# Cria texturas para a parede
+wall_textures = {
+    'albedo': create_texture("C:/Users/mbmui/Downloads/sprayed-wall-texture1-bl/albedo.png", 'albedo'),
+    'normal': create_texture("C:/Users/mbmui/Downloads/sprayed-wall-texture1-bl/normal-ogl.png", 'normal'),
+    'metallic': create_texture("C:/Users/mbmui/Downloads/sprayed-wall-texture1-bl/metallic.png", 'metallic'),
+    'roughness': create_texture("C:/Users/mbmui/Downloads/sprayed-wall-texture1-bl/roughness.png", 'roughness'),
+    'ao': create_texture("C:/Users/mbmui/Downloads/sprayed-wall-texture1-bl/ao.png", 'ao'),
+    'height': create_texture("C:/Users/mbmui/Downloads/sprayed-wall-texture1-bl/height.png", 'height')
+}
+
+# Cria textura para o rodapé
+baseboard_texture = create_texture("/path/to/dark_wood_texture.jpg", 'albedo')
 
 # Aplica texturas aos materiais
-apply_texture(wall_material, wall_texture)
+apply_textures(wall_material, wall_textures)
 apply_texture(baseboard_material, baseboard_texture)
 
 # Aplica materiais
