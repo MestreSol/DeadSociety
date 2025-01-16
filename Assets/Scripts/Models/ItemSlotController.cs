@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -45,4 +46,6 @@ public class ItemSlotController : MonoBehaviour
       durabilityPanel.SetActive(false);
     }
   }
+
+
 }

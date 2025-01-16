@@ -4,6 +4,10 @@ public class CollectableItem : MonoBehaviour, IInteractableObject
 {
   public Item itemName;
 
+  public void SetItem(Item item)
+  {
+    itemName = item;
+  }
   public void Interact()
   {
     Debug.Log($"Você coletou: {itemName.itemName}");
