@@ -115,8 +115,8 @@ namespace AI
                  break;
              case AIState.Attack:
                  if (Vector3.Distance(m_EnemyController.KnownDetectedTarget.transform.position,
-                         m_EnemyController.DetectionModule.DetectionSourcePoint.position)
-                     >= (AttackStopDistanceRatio * m_EnemyController.DetectionModule.AttackRange))
+                         m_EnemyController.DetectionModule.detectionSourcePoint.position)
+                     >= (AttackStopDistanceRatio * m_EnemyController.DetectionModule.attackRange))
                  {
                      m_EnemyController.SetNavDestination(m_EnemyController.KnownDetectedTarget.transform.position);
                  }

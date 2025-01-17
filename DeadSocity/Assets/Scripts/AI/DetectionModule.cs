@@ -9,25 +9,25 @@ namespace AI
     public class DetectionModule : MonoBehaviour
     {
         [Header("Detection Settings")]
-        public Transform DetectionSourcePoint;
-        public float DetectionRange = 20f;
-        public float AttackRange = 10f;
-        public float KnownTargetTimeout = 4f;
+        public Transform detectionSourcePoint;
+        public float detectionRange = 20f;
+        public float attackRange = 10f;
+        public float knownTargetTimeout = 4f;
 
         [Header("Animator")]
-        public Animator Animator;
+        public Animator animator;
 
         [Header("Events")]
         public UnityAction onDetectedTarget;
         public UnityAction onLostTarget;
 
-        public GameObject KnownDetectedTarget { get; private set; }
-        public bool IsTargetInAttackRange { get; private set; }
-        public bool IsSeeingTarget { get; private set; }
-        public bool HadKnownTarget { get; private set; }
+        public GameObject knownDetectedTarget { get; private set; }
+        public bool isTargetInAttackRange { get; private set; }
+        public bool isSeeingTarget { get; private set; }
+        public bool hadKnownTarget { get; private set; }
 
-        private float TimeLastSeenTarget = Mathf.NegativeInfinity;
-        private ActorsManager m_ActorsManager;
+        private float timeLastSeenTarget = Mathf.NegativeInfinity;
+        private ActorsManager actorsManager;
 
         private const string k_AnimAttackParameter = "Attack";
         private const string k_AnimOnDamagedParameter = "OnDamaged";
@@ -35,33 +35,33 @@ namespace AI
         protected virtual void Start()
         {
             // Initialize ActorsManager
-            m_ActorsManager = FindObjectOfType<ActorsManager>();
-            DebugUtility.HandleErrorIfNullFindObject<ActorsManager, DetectionModule>(m_ActorsManager, this);
+            actorsManager = FindObjectOfType<ActorsManager>();
+            DebugUtility.HandleErrorIfNullFindObject<ActorsManager, DetectionModule>(actorsManager, this);
         }
 
         public virtual void HandleTargetDetection(Actor actor, Collider[] selfColliders)
         {
             // Handle known target detection timeout
-            if (KnownDetectedTarget && !IsSeeingTarget && (Time.time - TimeLastSeenTarget) > KnownTargetTimeout)
+            if (knownDetectedTarget && !isSeeingTarget && (Time.time - timeLastSeenTarget) > knownTargetTimeout)
             {
-                KnownDetectedTarget = null;
+                knownDetectedTarget = null;
             }
 
             // Find the closest visible hostile actor
-            float sqrDetectionRange = DetectionRange * DetectionRange;
-            IsSeeingTarget = false;
+            float sqrDetectionRange = detectionRange * detectionRange;
+            isSeeingTarget = false;
             float closestSqrDistance = Mathf.Infinity;
 
-            foreach (Actor otherActor in m_ActorsManager.Actors)
+            foreach (Actor otherActor in actorsManager.Actors)
             {
                 if (otherActor.Affiliation != actor.Affiliation)
                 {
-                    float sqrDistance = (otherActor.transform.position - DetectionSourcePoint.position).sqrMagnitude;
+                    float sqrDistance = (otherActor.transform.position - detectionSourcePoint.position).sqrMagnitude;
                     if (sqrDistance < sqrDetectionRange && sqrDistance < closestSqrDistance)
                     {
                         // Check for obstructions
-                        RaycastHit[] hits = Physics.RaycastAll(DetectionSourcePoint.position,
-                            (otherActor.AimPoint.position - DetectionSourcePoint.position).normalized, DetectionRange,
+                        RaycastHit[] hits = Physics.RaycastAll(detectionSourcePoint.position,
+                            (otherActor.AimPoint.position - detectionSourcePoint.position).normalized, detectionRange,
                             -1, QueryTriggerInteraction.Ignore);
                         RaycastHit closestValidHit = new RaycastHit { distance = Mathf.Infinity };
                         bool foundValidHit = false;
@@ -80,34 +80,34 @@ namespace AI
                             Actor hitActor = closestValidHit.collider.GetComponentInParent<Actor>();
                             if (hitActor == otherActor)
                             {
-                                IsSeeingTarget = true;
+                                isSeeingTarget = true;
                                 closestSqrDistance = sqrDistance;
 
-                                TimeLastSeenTarget = Time.time;
-                                KnownDetectedTarget = otherActor.AimPoint.gameObject;
+                                timeLastSeenTarget = Time.time;
+                                knownDetectedTarget = otherActor.AimPoint.gameObject;
                             }
                         }
                     }
                 }
             }
 
-            IsTargetInAttackRange = KnownDetectedTarget != null &&
-                                    Vector3.Distance(transform.position, KnownDetectedTarget.transform.position) <=
-                                    AttackRange;
+            isTargetInAttackRange = knownDetectedTarget != null &&
+                                    Vector3.Distance(transform.position, knownDetectedTarget.transform.position) <=
+                                    attackRange;
 
             // Detection events
-            if (!HadKnownTarget && KnownDetectedTarget != null)
+            if (!hadKnownTarget && knownDetectedTarget != null)
             {
                 OnDetect();
             }
 
-            if (HadKnownTarget && KnownDetectedTarget == null)
+            if (hadKnownTarget && knownDetectedTarget == null)
             {
                 OnLostTarget();
             }
 
             // Remember if we already knew a target (for next frame)
-            HadKnownTarget = KnownDetectedTarget != null;
+            hadKnownTarget = knownDetectedTarget != null;
         }
 
         public virtual void OnLostTarget() => onLostTarget?.Invoke();
@@ -116,20 +116,20 @@ namespace AI
 
         public virtual void OnDamaged(GameObject damageSource)
         {
-            TimeLastSeenTarget = Time.time;
-            KnownDetectedTarget = damageSource;
+            timeLastSeenTarget = Time.time;
+            knownDetectedTarget = damageSource;
 
-            if (Animator)
+            if (animator)
             {
-                Animator.SetTrigger(k_AnimOnDamagedParameter);
+                animator.SetTrigger(k_AnimOnDamagedParameter);
             }
         }
 
         public virtual void OnAttack()
         {
-            if (Animator)
+            if (animator)
             {
-                Animator.SetTrigger(k_AnimAttackParameter);
+                animator.SetTrigger(k_AnimAttackParameter);
             }
         }
     }

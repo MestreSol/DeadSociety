@@ -79,10 +79,10 @@ public class EnemyController : MonoBehaviour
     MaterialPropertyBlock m_EyeColorMaterialPropertyBlock;
 
     public PatrolPath PatrolPath { get; set; }
-    public GameObject KnownDetectedTarget => DetectionModule.KnownDetectedTarget;
-    public bool IsTargetInAttackRange => DetectionModule.IsTargetInAttackRange;
-    public bool IsSeeingTarget => DetectionModule.IsSeeingTarget;
-    public bool HadKnownTarget => DetectionModule.HadKnownTarget;
+    public GameObject KnownDetectedTarget => DetectionModule.knownDetectedTarget;
+    public bool IsTargetInAttackRange => DetectionModule.isTargetInAttackRange;
+    public bool IsSeeingTarget => DetectionModule.isSeeingTarget;
+    public bool HadKnownTarget => DetectionModule.hadKnownTarget;
     public NavMeshAgent NavMeshAgent { get; private set; }
     public DetectionModule DetectionModule { get; private set; }
 
@@ -350,10 +350,10 @@ public class EnemyController : MonoBehaviour
         if (DetectionModule != null)
         {
             Gizmos.color = DetectionRangeColor;
-            Gizmos.DrawWireSphere(transform.position, DetectionModule.DetectionRange);
+            Gizmos.DrawWireSphere(transform.position, DetectionModule.detectionRange);
 
             Gizmos.color = AttackRangeColor;
-            Gizmos.DrawWireSphere(transform.position, DetectionModule.AttackRange);
+            Gizmos.DrawWireSphere(transform.position, DetectionModule.attackRange);
         }
     }
 
