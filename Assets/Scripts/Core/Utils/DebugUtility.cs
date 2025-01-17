@@ -1,8 +1,9 @@
 ﻿using AI;
+using UnityEngine;
 
 namespace Core.Utils
 {
-       public static class DebugUtility
+    public static class DebugUtility
     {
         public static void HandleErrorIfNullGetComponent<TO, TS>(Component component, Component source,
             GameObject onObject)
@@ -17,7 +18,7 @@ namespace Core.Utils
 #endif
         }
 
-        public static void HandleErrorIfNullFindObject<TO, TS>(UnityEngine.Object obj, DetectionModule source)
+        public static void HandleErrorIfNullFindObject<TO, TS>(UnityEngine.Object obj, Component source)
         {
 #if UNITY_EDITOR
             if (obj == null)

@@ -15,7 +15,7 @@ namespace AI
         {
             foreach (var enemy in EnemiesToAssign)
             {
-                enemy.PatrolPath = this;
+                enemy.patrolPath = this;
             }
         }
 
