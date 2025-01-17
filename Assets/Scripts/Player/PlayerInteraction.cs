@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using TMPro;
 
 public class PlayerInteraction : MonoBehaviour
@@ -19,7 +19,6 @@ public class PlayerInteraction : MonoBehaviour
     Vector3 rayOrigin = cameraTransform.position;
     Vector3 rayDirection = cameraTransform.forward;
 
-    // Desenha o Raycast na cena para depuração
     Debug.DrawRay(rayOrigin, rayDirection * interactionRange, Color.red, 0.5f);
 
     if (Physics.Raycast(rayOrigin, rayDirection, out hit, interactionRange))
@@ -34,15 +33,13 @@ public class PlayerInteraction : MonoBehaviour
 
   private void ProcessHit(RaycastHit hit)
   {
-    // Verifica se o objeto possui a tag "Interactable"
     if (hit.collider.CompareTag("Interactable"))
     {
       IInteractableObject interactable = hit.collider.GetComponent<IInteractableObject>();
       if (interactable != null)
       {
-        interactionText.text = interactable.GetInteractionMessage(); // Atualiza a mensagem na UI
+        interactionText.text = interactable.GetInteractionMessage();
 
-        // Executa a interação quando a tecla E é pressionada
         if (Input.GetKeyDown(KeyCode.E))
         {
           interactable.Interact();
