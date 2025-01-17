@@ -3,41 +3,63 @@ using TMPro;
 
 public class PlayerInteraction : MonoBehaviour
 {
-  [Header("Interaction Settings")] public float interactionRange = 2f;
-  public TextMeshProUGUI interactionText; // Adicione um campo para o texto de interação
-  public Transform cameraTransform;
+  [Header("Interaction Settings")]
+  [SerializeField] private float interactionRange = 2f;
+  [SerializeField] private Transform cameraTransform;
+  [SerializeField] private TextMeshProUGUI interactionText;
+
   private void Update()
   {
-    if (Input.GetKeyDown(KeyCode.E)) // Tecla de interação
-    {
-      RaycastHit hit;
-      Vector3 rayOrigin = cameraTransform.position;
-      Vector3 rayDirection = cameraTransform.forward;
-      Debug.DrawRay(rayOrigin, rayDirection * interactionRange, Color.red, 1f); // Desenha o Raycast na cena
+    HandleInteraction();
+  }
 
-      if (Physics.Raycast(rayOrigin, rayDirection, out hit, interactionRange))
+  private void HandleInteraction()
+  {
+    RaycastHit hit;
+    Vector3 rayOrigin = cameraTransform.position;
+    Vector3 rayDirection = cameraTransform.forward;
+
+    // Desenha o Raycast na cena para depuração
+    Debug.DrawRay(rayOrigin, rayDirection * interactionRange, Color.red, 0.5f);
+
+    if (Physics.Raycast(rayOrigin, rayDirection, out hit, interactionRange))
+    {
+      ProcessHit(hit);
+    }
+    else
+    {
+      ClearInteractionText();
+    }
+  }
+
+  private void ProcessHit(RaycastHit hit)
+  {
+    // Verifica se o objeto possui a tag "Interactable"
+    if (hit.collider.CompareTag("Interactable"))
+    {
+      IInteractableObject interactable = hit.collider.GetComponent<IInteractableObject>();
+      if (interactable != null)
       {
-        Debug.Log("Raycast hit: " + hit.collider.name); // Loga o nome do objeto atingido
-        if (hit.collider.CompareTag("Interactable"))
+        interactionText.text = interactable.GetInteractionMessage(); // Atualiza a mensagem na UI
+
+        // Executa a interação quando a tecla E é pressionada
+        if (Input.GetKeyDown(KeyCode.E))
         {
-          Debug.Log("Hit object: " + hit.collider.name);
-          // Procura pelo componente de interação no objeto
-          IInteractableObject interactable = hit.collider.GetComponent<IInteractableObject>();
-          if (interactable != null)
-          {
-            interactable.Interact();
-            interactionText.text = interactable.GetInteractionMessage(); // Exibe a mensagem de interação
-          }
-        }
-        else
-        {
-          Debug.Log("Hit object is not interactable");
+          interactable.Interact();
         }
       }
-      else
-      {
-        Debug.Log("Raycast did not hit any object");
-      }
+    }
+    else
+    {
+      ClearInteractionText();
+    }
+  }
+
+  private void ClearInteractionText()
+  {
+    if (interactionText != null)
+    {
+      interactionText.text = string.Empty;
     }
   }
 }

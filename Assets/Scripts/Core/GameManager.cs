@@ -3,66 +3,67 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance {get; private set;}
-    public enum GameState { Menu, Playing, Pause, GameOver }
-    public GameState CurrentGameState {get; private set;}
+  public static GameManager Instance { get; private set; }
 
-    public delegate void GameStateChanged(GameState newGameState);
-    public static event GameStateChanged OnGameStateChanged;
+  public enum GameState { Menu, Playing, Paused, GameOver }
+  public GameState CurrentGameState { get; private set; }
 
-    private void Awake(){
-      if(Instance != null && Instance != this){
-        Destroy(gameObject);
-      } else {
-        Instance = this;
-        DontDestroyOnLoad(gameObject);
-      }
+  public event Action<GameState> OnGameStateChanged;
 
-      Instance = this;
-      DontDestroyOnLoad(gameObject);
-    }
-
-    private void Start()
+  private void Awake()
+  {
+    if (Instance != null && Instance != this)
     {
-      ChangeState(GameState.Playing);
+      Destroy(gameObject);
+      return;
     }
+    Instance = this;
+    DontDestroyOnLoad(gameObject);
+  }
 
-    private void Update()
+  private void Start()
+  {
+    ChangeState(GameState.Playing);
+  }
+
+  private void Update()
+  {
+    HandleInput();
+  }
+
+  private void HandleInput()
+  {
+    if (Input.GetKeyDown(KeyCode.Escape) && CurrentGameState != GameState.Menu)
     {
-      if (Input.GetKeyDown(KeyCode.Escape) && CurrentGameState != GameState.Menu)
-      {
-        if (CurrentGameState == GameState.Playing)
-        {
-          ChangeState(GameState.Pause);
-        }
-        else if(CurrentGameState == GameState.Pause)
-        {
-          ChangeState(GameState.Playing);
-        }
-      }
+      if (CurrentGameState == GameState.Playing)
+        ChangeState(GameState.Paused);
+      else if (CurrentGameState == GameState.Paused)
+        ChangeState(GameState.Playing);
     }
+  }
 
-    public void ChangeState(GameState newState)
+  public void ChangeState(GameState newState)
+  {
+    if (CurrentGameState == newState) return;
+
+    CurrentGameState = newState;
+    OnGameStateChanged?.Invoke(newState);
+
+    Time.timeScale = newState switch
     {
-      CurrentGameState = newState;
-      OnGameStateChanged?.Invoke(newState);
+      GameState.Menu => 0f,
+      GameState.Paused => 0f,
+      GameState.GameOver => 0f,
+      GameState.Playing => 1f,
+      _ => Time.timeScale
+    };
 
-      switch (newState)
-      {
-        case GameState.Menu:
-        case GameState.Pause:
-        case GameState.GameOver:
-          Time.timeScale = 0f;
-          break;
-        case GameState.Playing:
-          Time.timeScale = 1f;
-          break;
-      }
-    }
+    Debug.Log($"Estado do jogo alterado para: {newState}");
+  }
 
-    public void GameOver()
-    {
-      Debug.Log("Game Over");
-      ChangeState(GameState.GameOver);
-    }
+  public void GameOver()
+  {
+    ChangeState(GameState.GameOver);
+    Debug.Log("Game Over");
+  }
 }
