@@ -2,27 +2,21 @@ using UnityEngine;
 
 public class CollectableItem : MonoBehaviour, IInteractableObject
 {
-  [SerializeField] private Item item;
+  public Item itemName;
 
-  public void SetItem(Item newItem)
+  public void SetItem(Item item)
   {
-    item = newItem;
+    itemName = item;
   }
-
   public void Interact()
   {
-    if (item == null) return;
-
-    Debug.Log($"Você coletou: {item.itemName}");
-
-    // Dispara evento de coleta para outros sistemas
-    CollectableItemEventSystem.RaiseItemCollected(item);
-
+    Debug.Log($"Você coletou: {itemName.itemName}");
+    PlayerInventory playerInventory = FindObjectOfType<PlayerInventory>();
+    playerInventory?.AddItem(itemName);
     Destroy(gameObject);
   }
-
   public string GetInteractionMessage()
   {
-    return $"Coletar {item.itemName}";
+    return $"Você coletou: {itemName.itemName}";
   }
 }

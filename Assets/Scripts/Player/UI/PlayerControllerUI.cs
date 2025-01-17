@@ -1,29 +1,22 @@
-﻿using UnityEngine;
+﻿
+  using System.Runtime.CompilerServices;
+  using UnityEngine;
 
-[RequireComponent(typeof(PlayerInventoryUI))]
-public class PlayerControllerUI : MonoBehaviour
-{
-  [Header("UI References")]
-  [SerializeField] private PlayerInventoryUI playerInventoryUI;
-
-  private void Awake()
+  [RequireComponent(typeof(PlayerInventoryUI))]
+  public class PlayerControllerUI : MonoBehaviour
   {
-    if (playerInventoryUI == null)
-    {
-      playerInventoryUI = GetComponent<PlayerInventoryUI>();
-    }
-  }
+      private PlayerInventoryUI playerInventoryUI;
 
-  private void Update()
-  {
-    HandleInventoryToggle();
-  }
+      private void Start()
+      {
+          playerInventoryUI = GetComponent<PlayerInventoryUI>();
+      }
 
-  private void HandleInventoryToggle()
-  {
-    if (Input.GetKeyDown(KeyCode.I))
-    {
-      playerInventoryUI.ToggleInventory();
-    }
+      private void Update()
+      {
+          if (Input.GetKeyDown(KeyCode.I))
+          {
+              playerInventoryUI.ToggleInventory();
+          }
+      }
   }
-}
